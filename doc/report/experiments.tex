@@ -1,0 +1,46 @@
+\section{Experiments}
+Measuring the quality of the TweetRank score is difficult because there are no reference corpora to be tested on, the only thing that we did was to try it together with Solr and checked that the result quality was good.
+
+We implemented the Power Iteration method for TweetRank and computed the TweetRank for small sets of tweets with a precision of $10^{-10}$. Table \ref{table:mc_errors} shows the relative error between the ranking obtained by Power Iteration and our Monte Carlo approximation. We have also plotted the sorted list of TweetRank values in log-log scale and found that it closely follows the power law, as stated by \cite{Avrachenkov:2007:MCM:1272804.1272825}. Figure \ref{fig:tweetrank_powerlaw} shows this fact.
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|}
+\hline Tweets & Relative error (\%) \\
+\hline 5658 & $8.13109904923 \cdot 10^{-4}$ \\
+\hline 17174 & $6.10684768151 \cdot 10^{-5}$ \\
+\hline 32828 & $7.79007058261 \cdot 10^{-5}$ \\
+\hline 46934 & $2.724550120103 \cdot 10^{-5}$ \\
+\hline
+\end{tabular}
+\caption{Relative error between our algorithm and Power Iteration with $10^{-10}$ precision}
+\label{table:mc_errors}
+\end{table}
+
+\begin{figure}
+\centering
+\subfigure[Sorted TweetRank, loglog scale]{\includegraphics[width=0.4\textwidth]{tweetrank_powerlaw.pdf}\label{fig:tweetrank_powerlaw}}
+\qquad
+\subfigure[Running time vs. tweets]{\includegraphics[width=0.4\textwidth]{tweetrank_times.pdf}\label{fig:tweetrank_times}} 
+\caption{Experiment results}
+\end{figure}
+
+Figure \ref{fig:tweetrank_times} shows the number of tweets versus the running time. We see that a quadratic curve fits very well with the experimental data, which confirms our analysis of the expected running time described in equation \ref{eq:running_time} (section \ref{sec:tweetrank_implementation}). These results were obtained on a machine and parameters specified in table \ref{table:machine_spec}. 
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|}
+\hline Processor & Intel Core i5, 2 cores at 2.4GHz, 64 bits \\
+\hline Memory & Main: 4GB DDR3, Cache L3: 3MB, Cache L2: 256KB \\
+\hline OS &  Mac OS X 10.6.8 Snow Leopard \\
+\hline Compiler & javac 1.6.0\_31, 64 bits, no optimization parameters \\
+\hline Others & 8 threads, $\alpha = 0.2, \beta = 0.4, \gamma = 0.2, \delta = 0.04, \epsilon = 0.16, M = T/100$ \\
+\hline
+\end{tabular}
+\caption{Specification of the machine used for experimentation}
+\label{table:machine_spec}
+\end{table}
+
+It's important to observe that our model has many parameters to be adjusted. Designing a good set of experiments to be able to choose the best values would require a lot of time and would be expensive to test. For estimating the optimal values for the probabilities used by our algorithm, the simplest solution would be trying different combinations of the parameters and try to find the one that produces the best result. However, this would require a tremendous amount of time and, even more important, would require a labelled dataset to measure the precision and recall of the search engine.
+
+Another approach would be to monitor these probabilities on real users. For example, installing a plug-in on the web browser that registers the activity of the user (when the user clicks on a retweet or reply, on a mentioned user, on the friends list, etc). To preserve anonymity, this would be a plug-in installed in a volunteer's browser and the data collected would not contain any personal information (it is not important for us which tweet the user is visiting, but how he or she got to it). Using this data, one could estimate those probabilities and use the estimated values as parameters to compute the TweetRank.
